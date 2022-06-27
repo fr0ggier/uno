@@ -23,16 +23,16 @@ wss.on('connection', (socket: any) => {
 		let message = JSON.parse(data);
 
 		if (message.type == 'createGame') {
-			games.set(message.body, new Game(message.body, new Player(socket)));
+			games.set(message.body.code, new Game(message.body.code, new Player(socket, message.body.name)));
 		} else if (message.type == 'joinGame') {
-			let game = games.get(message.body);
+			let game = games.get(message.body.code);
 			if (!game) {
 				// скажать что автор даун
 			} else {
-				game.addPlayer(socket);
+				game.addPlayer(socket, message.body.name);
 			}
 		} else if (message.type == 'startGame') {
-			let game = games.get(message.body);
+			let game = games.get(message.body.code);
 			if (!game) {
 				// сказать что автор даун
 			} else {

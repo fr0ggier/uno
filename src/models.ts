@@ -13,7 +13,7 @@ type Color = 'red' | 'yellow' | 'blue' | 'green';
 type CardType = 'number' | 'reverse' | 'skip' | 'taketwo' | 'choice';
 type CardValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
-interface Card {
+export interface Card {
 	color?: Color;
 	type: CardType;
 	value?: CardValue;
@@ -28,9 +28,13 @@ interface NumberCard extends Card {
 export class Player {
 	socket: WebSocket;
 	cards: Card[];
+	name: string;
 
-	constructor(socket: any) {
+	constructor(socket: any, name: string) {
 		this.socket = socket;
+
+		this.name = name;
+
 		this.cards = [];
 	}
 
@@ -39,11 +43,30 @@ export class Player {
 	}
 
 	getCards() {
-		this.socket.send(JSON.stringify(this.cards));
+		let data = {
+			type: 'getCards',
+			body: this.cards,
+		};
+
+		this.socket.send(JSON.stringify(data));
 	}
 
 	getLastCard(card: Card) {
-		this.socket.send(JSON.stringify(card));
+		let data = {
+			type: 'getLastCard',
+			body: card,
+		};
+
+		this.socket.send(JSON.stringify(data));
+	}
+
+	getPlayers(players: Player[]) {
+		let data = {
+			type: 'getPlayers',
+			body: players,
+		};
+
+		this.socket.send(JSON.stringify(data));
 	}
 }
 
@@ -66,7 +89,7 @@ export class Game {
 		this.deck = [];
 		this.lastCard = {
 			color: ['red', 'yellow', 'blue', 'green'][randomNumber(0, 3)] as Color,
-			type: 'choice'
+			type: 'choice',
 		};
 
 		// Добавление карт с цифрами
@@ -101,11 +124,11 @@ export class Game {
 		}
 	}
 
-	addPlayer(socket: any): void {
-		if (!this.started) this.players.push(new Player(socket));
+	addPlayer(socket: any, name: string): void {
+		if (!this.started) this.players.push(new Player(socket, name));
 	}
 
-	generateCard(): Card {
+	pullCard(): Card {
 		let index = randomNumber(0, this.deck.length - 1);
 		let card = this.deck[index];
 		delete this.deck[index];
@@ -113,13 +136,14 @@ export class Game {
 	}
 
 	start(): void {
-		this.players.forEach((player) => {
+		for (const player of this.players) {
 			for (let i = 0; i < 9; i++) {
-				player.cards.push(this.generateCard());
+				player.cards.push(this.pullCard());
 			}
+			player.getPlayers(this.players.splice(this.players.indexOf(player), 1));
 			player.getCards();
 			player.getLastCard(this.lastCard);
-		});
+		}
 	}
 
 	cycle(): void {}

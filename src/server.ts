@@ -111,7 +111,7 @@ interface NumberCard {
 */
 
 const { WebSocketServer } = require('ws');
-const wsserver = new WebSocketServer({
+const wss = new WebSocketServer({
 	server: server,
 });
 
@@ -121,8 +121,8 @@ app.get('/', (req: any, res: any) => {
 	res.sendFile(__dirname + '/index.html');
 });
 
-wsserver.on('connection', (socket: any) => {
-	socket.on('message', (data:any) => {
+wss.on('connection', (socket: any) => {
+	socket.on('message', (data: any) => {
 		console.log(`Received data: ${data}`);
 	});
 });

@@ -118,7 +118,7 @@ const wss = new WebSocketServer({
 app.use(express.static('public'));
 
 app.get('/', (req: any, res: any) => {
-	res.sendFile(__dirname + '/dist/index.html');
+	res.sendFile(__dirname + '/public/index.html');
 });
 
 wss.on('connection', (socket: any) => {

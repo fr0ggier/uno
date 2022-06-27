@@ -1,3 +1,5 @@
+import { json } from 'stream/consumers';
+
 const socket = new WebSocket('ws://localhost:3000');
 
 socket.onopen = () => {
@@ -13,7 +15,7 @@ socket.onerror = (err) => {
 };
 
 socket.onmessage = (message) => {
-	console.log(message);
+	console.log(JSON.parse(message.data));
 };
 
 function sendData(data: string): void {
@@ -24,4 +26,41 @@ function sendData(data: string): void {
 	} else {
 		socket.send(data);
 	}
+}
+
+function joinGame(code: string): void {
+	let data = {
+		type: 'joinGame',
+		code: code,
+	};
+
+	sendData(JSON.stringify(data));
+}
+
+function createGame(): void {
+	let data = {
+		type: 'createGame',
+		code: makeCode(),
+	};
+
+	sendData(JSON.stringify(data));
+}
+
+function startGame(): void {
+	let data = {
+		type: 'startGame',
+	};
+
+	sendData(JSON.stringify(data));
+}
+
+function makeCode(): string {
+	let code = '';
+	let symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+
+	for (let i = 0; i < 4; i++) {
+		code += symbols[Math.floor(Math.random() * symbols.length - 1)];
+	}
+
+	return code;
 }

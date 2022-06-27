@@ -1,6 +1,7 @@
 import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
 import * as express from 'express';
+import { Player, Game } from './models';
 
 const app = express();
 const server = createServer(app);
@@ -9,6 +10,8 @@ const wss = new WebSocketServer({
 	server: server,
 });
 
+const games: Game[] = [];
+
 app.use(express.static('public'));
 
 app.get('/', (req: any, res: any) => {
@@ -16,9 +19,18 @@ app.get('/', (req: any, res: any) => {
 });
 
 wss.on('connection', (socket: any) => {
-	socket.on('message', (data: any) => {
-		console.log(`Received data: ${data}`);
+	socket.on('message', (data: string) => {
+		let message = JSON.parse(data);
+
+		if (message.type == 'createGame') {
+			games.push(new Game(message.body, socket));
+		} else if (message.type == 'joinGame') {
+				
+		}
 	});
+
+	games.push(new Game('aboba', new Player(socket)));
+	games[0].start();
 });
 
 server.listen('3000', () => {

@@ -9,7 +9,7 @@ type Color = 'red' | 'yellow' | 'blue' | 'green';
     skip - следующий игрок пропускает ход
     taketwo - следующий игрок берёт 2 карты
     choice - ты выбираешь цвет
-*/ 
+*/
 type CardType = 'number' | 'reverse' | 'skip' | 'taketwo' | 'choice';
 type CardValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 
@@ -36,6 +36,10 @@ export class Player {
 
 	takeCard() {
 		// this.cards.push(...)
+	}
+
+	getCards() {
+		this.socket.send(JSON.stringify(this.cards));
 	}
 }
 
@@ -99,5 +103,12 @@ export class Game {
 		return card;
 	}
 
-	start(): void {}
+	start(): void {
+		this.players.forEach((player) => {
+			for (let i = 0; i < 9; i++) {
+				player.cards.push(this.generateCard());
+			}
+			player.getCards();
+		});
+	}
 }

@@ -13,6 +13,10 @@ socket.onerror = (err) => {
 	console.log(`Ошибка: ${err.message}`);
 };
 
+socket.onmessage = (message) => {
+	console.log(message);
+};
+
 function sendData(data: JSON): void {
 	if (!socket.readyState) {
 		setTimeout(() => {

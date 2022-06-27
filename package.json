@@ -4,8 +4,8 @@
 	"description": "",
 	"main": "server.js",
 	"scripts": {
-		"start": "node dist/server.js",
-		"build": "tsc --skipLibCheck"
+		"start": "node build/server.js",
+		"build": "tsc --skipLibCheck --p tsconfig.json && tsc --skipLibCheck --p public/tsconfig.json"
 	},
 	"repository": {
 		"type": "git",

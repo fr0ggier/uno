@@ -3,10 +3,13 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 
-let sockets = {};
+let sockets: Object = {};
 
 class Player {
-	constructor(socket) {
+	socket: any;
+	cards: Object[];
+
+	constructor(socket: any) {
 		this.socket = socket;
 		this.cards = [];
 	}
@@ -17,7 +20,13 @@ class Player {
 }
 
 class Game {
-	constructor(code, firstPlayer) {
+	code: string;
+	players: Object[];
+	host: any;
+	started: boolean;
+	deck: Object[];
+
+	constructor(code: string, firstPlayer: any) {
 		this.code = code;
 
 		this.players = [firstPlayer];
@@ -27,7 +36,7 @@ class Game {
 
 		this.deck = [];
 
-		// добавляю карты с цифрами
+		// Добавление карт с цифрами
 		for (let i = 0; i < 10; i++) {
 			for (let j = 0; j < 4; j++) {
 				for (let k = 2; k > 0; k--) {
@@ -40,6 +49,7 @@ class Game {
 			}
 		}
 
+		// Добавление уникальных карт
 		for (let i = 0; i < 4; i++) {
 			for (let j = 0; j < 3; j++) {
 				for (let k = 2; k > 0; k--) {
@@ -50,76 +60,31 @@ class Game {
 				}
 			}
 		}
+
+		for (let i = 0; i < 4; i++) {
+			this.deck.push({
+				type: 'choice',
+			});
+		}
 	}
 
-	addPlayer(socket) {
+	addPlayer(socket: any): void {
 		if (!this.started) this.players.push(new Player(socket));
 	}
 
-	generateCard() {
+	generateCard(): object {
 		let index = randomNumber(0, this.deck.length - 1);
 		let card = this.deck[index];
-		delete deck[index];
+		delete this.deck[index];
 		return card;
 	}
 
-	start() {}
+	start(): void {}
 }
 
-/* function generateCard() {
-  let card = {};
-
-  if (randomNumber(1, 104) > 80) {
-    switch (randomNumber(0, 3)) {
-      case 0:
-        card.type = 'taketwo'
-        break
-      case 1:
-        card.type = 'reverse'
-        break
-      case 2:
-        card.type = 'skip'
-        break
-      case 3:
-        card.type = 'choice'
-        break
-    };
-  } else {
-    card.type = 'number';
-    card.value = randomNumber(0, 9);
-  };
-
-  if (card.type !== 'choice') {
-    switch (randomNumber(0, 3)) {
-      case 0:
-        card.color = 'red';
-        break;
-      case 1:
-        card.color = 'green';
-        break
-      case 2:
-        card.color = 'yellow';
-        break;
-      case 3:
-        card.color = 'blue';
-        break;
-    };
-  }
-
-  return card;
-}; */
-
-function randomNumber(min, max) {
+function randomNumber(min: number, max: number): number {
 	return Math.floor(min + Math.random() * (max - min));
 }
-
-// enum aboba {
-//   alpha = 1,
-//   beta = 2,
-//   gamma = 3
-// }
-
-// aboba.alpha // 1
 
 /*
 number - обычная карта со значением от 0 до 9.
@@ -152,12 +117,12 @@ const wsserver = new WebSocketServer({
 
 app.use(express.static('public'));
 
-app.get('/', (req, res) => {
+app.get('/', (req: any, res: any) => {
 	res.sendFile(__dirname + '/index.html');
 });
 
-wsserver.on('connection', (socket) => {
-	socket.on('message', (data) => {
+wsserver.on('connection', (socket: any) => {
+	socket.on('message', (data:any) => {
 		console.log(`Received data: ${data}`);
 	});
 });

@@ -1,4 +1,11 @@
+import { Player, Card } from './../../src/models';
+
 const socket = new WebSocket('ws://localhost:3000');
+
+let cards: Card[] = [];
+let lastCard: Card;
+let players: Player[] = [];
+// let turn:
 
 socket.onopen = () => {
 	console.log('Connected to server successfully');
@@ -13,7 +20,15 @@ socket.onerror = (err) => {
 };
 
 socket.onmessage = (message) => {
-	console.log(JSON.parse(message.data));
+	const res = JSON.parse(message.data);
+
+	if (res.type == 'getCards') {
+		cards = res.body;
+	} else if (res.type == 'getLastCard') {
+		lastCard = res.body;
+	} else if (res.type == 'getPlayers') {
+		players = res.body;
+	}
 };
 
 function sendData(data: string): void {
@@ -26,19 +41,19 @@ function sendData(data: string): void {
 	}
 }
 
-function joinGame(code: string): void {
+function joinGame(code: string, name: string): void {
 	let data = {
 		type: 'joinGame',
-		code: code,
+		body: { code: code, name: name },
 	};
 
 	sendData(JSON.stringify(data));
 }
 
-function createGame(): void {
+function createGame(name: string): void {
 	let data = {
 		type: 'createGame',
-		code: makeCode(),
+		body: { code: makeCode(), name: name },
 	};
 
 	sendData(JSON.stringify(data));
@@ -47,7 +62,7 @@ function createGame(): void {
 function startGame(code: string): void {
 	let data = {
 		type: 'startGame',
-		code: code,
+		body: { code: code },
 	};
 
 	sendData(JSON.stringify(data));

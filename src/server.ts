@@ -18,15 +18,15 @@ choice - ты выбираешь цвет
 */
 
 interface Card {
-  color?: Color,
-  type: CardType,
-  value?: CardValue
+	color?: Color;
+	type: CardType;
+	value?: CardValue;
 }
 
 interface NumberCard extends Card {
-  color: Color,
-  type: 'number',
-  value: CardValue
+	color: Color;
+	type: 'number';
+	value: CardValue;
 }
 
 class Player {
@@ -118,7 +118,7 @@ const wss = new WebSocketServer({
 app.use(express.static('public'));
 
 app.get('/', (req: any, res: any) => {
-	res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + '/dist/index.html');
 });
 
 wss.on('connection', (socket: any) => {

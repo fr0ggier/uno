@@ -5,9 +5,33 @@ const server = http.createServer(app);
 
 let sockets: Object = {};
 
+type Color = 'red' | 'yellow' | 'blue' | 'green';
+type CardType = 'number' | 'reverse' | 'skip' | 'taketwo' | 'choice';
+type CardValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
+/*
+number - обычная карта со значением от 0 до 9.
+reverse - меняет направление
+skip - следующий игрок пропускает ход
+taketwo - следующий игрок берёт 2 карты
+choice - ты выбираешь цвет
+*/
+
+interface Card {
+  color?: Color,
+  type: CardType,
+  value?: CardValue
+}
+
+interface NumberCard extends Card {
+  color: Color,
+  type: 'number',
+  value: CardValue
+}
+
 class Player {
 	socket: any;
-	cards: Object[];
+	cards: Card[];
 
 	constructor(socket: any) {
 		this.socket = socket;
@@ -21,10 +45,10 @@ class Player {
 
 class Game {
 	code: string;
-	players: Object[];
+	players: Player[];
 	host: any;
 	started: boolean;
-	deck: Object[];
+	deck: Card[];
 
 	constructor(code: string, firstPlayer: any) {
 		this.code = code;
@@ -41,8 +65,8 @@ class Game {
 			for (let j = 0; j < 4; j++) {
 				for (let k = 2; k > 0; k--) {
 					this.deck.push({
-						color: ['red', 'yellow', 'blue', 'green'][j],
-						number: i,
+						color: ['red', 'yellow', 'blue', 'green'][j] as Color,
+						value: i as CardValue,
 						type: 'number',
 					});
 				}
@@ -54,8 +78,8 @@ class Game {
 			for (let j = 0; j < 3; j++) {
 				for (let k = 2; k > 0; k--) {
 					this.deck.push({
-						color: ['red', 'yellow', 'blue', 'green'][i],
-						type: ['reverse', 'skip', 'taketwo'][j],
+						color: ['red', 'yellow', 'blue', 'green'][i] as Color,
+						type: ['reverse', 'skip', 'taketwo'][j] as CardType,
 					});
 				}
 			}
@@ -72,7 +96,7 @@ class Game {
 		if (!this.started) this.players.push(new Player(socket));
 	}
 
-	generateCard(): object {
+	generateCard(): Card {
 		let index = randomNumber(0, this.deck.length - 1);
 		let card = this.deck[index];
 		delete this.deck[index];
@@ -85,30 +109,6 @@ class Game {
 function randomNumber(min: number, max: number): number {
 	return Math.floor(min + Math.random() * (max - min));
 }
-
-/*
-number - обычная карта со значением от 0 до 9.
-reverse - меняет направление
-skip - следующий игрок пропускает ход
-taketwo - следующий игрок берёт 2 карты
-choice - ты выбираешь цвет
-
-type Color = 'red' | 'yellow' | 'blue' | 'green';
-type CardType = 'number' | 'reverse' | 'skip' | 'taketwo' | 'choice';
-type CardValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-
-interface Card {
-  color?: Color,
-  type: CardType,
-  value?: CardValue
-}
-
-interface NumberCard {
-  color: Color,
-  type: 'number',
-  value: CardValue
-}
-*/
 
 const { WebSocketServer } = require('ws');
 const wss = new WebSocketServer({

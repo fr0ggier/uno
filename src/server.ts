@@ -10,7 +10,7 @@ const wss = new WebSocketServer({
 	server: server,
 });
 
-const games: Game[] = [];
+const games: Map<string, Game> = new Map();
 
 app.use(express.static('public'));
 
@@ -23,16 +23,27 @@ wss.on('connection', (socket: any) => {
 		let message = JSON.parse(data);
 
 		if (message.type == 'createGame') {
-			games.push(new Game(message.body, new Player(socket)));
+			games.set(message.body, new Game(message.body, new Player(socket)));
 		} else if (message.type == 'joinGame') {
-
-		} else if(message.type == 'startGame') {
-
+			let game = games.get(message.body);
+			if (!game) {
+				// скажать что автор даун
+			} else {
+				game.addPlayer(socket);
+			}
+		} else if (message.type == 'startGame') {
+			let game = games.get(message.body);
+			if (!game) {
+				// сказать что автор даун
+			} else {
+				if (game.host.socket == socket) {
+					game.start();
+				} else {
+					// сказать что автор женщина (не имеет прав)
+				}
+			}
 		}
 	});
-
-	games.push(new Game('aboba', new Player(socket)));
-	games[0].start();
 });
 
 server.listen('3000', () => {

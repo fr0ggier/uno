@@ -46,13 +46,16 @@ function createGame(): void {
 	sendData(JSON.stringify(data));
 }
 
-function startGame(): void {
+function startGame(code: string): void {
 	let data = {
 		type: 'startGame',
+		code: code,
 	};
 
 	sendData(JSON.stringify(data));
 }
+
+let codez;
 
 function makeCode(): string {
 	let code = '';
@@ -61,6 +64,8 @@ function makeCode(): string {
 	for (let i = 0; i < 4; i++) {
 		code += symbols[Math.floor(Math.random() * symbols.length - 1)];
 	}
+
+	codez = code;
 
 	return code;
 }

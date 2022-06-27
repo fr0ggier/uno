@@ -23,9 +23,11 @@ wss.on('connection', (socket: any) => {
 		let message = JSON.parse(data);
 
 		if (message.type == 'createGame') {
-			games.push(new Game(message.body, socket));
+			games.push(new Game(message.body, new Player(socket)));
 		} else if (message.type == 'joinGame') {
-				
+
+		} else if(message.type == 'startGame') {
+
 		}
 	});
 

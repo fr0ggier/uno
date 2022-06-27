@@ -1,4 +1,3 @@
-import { WebSocket } from 'ws';
 const socket = new WebSocket('ws://localhost:3000');
 
 socket.onopen = () => {
@@ -10,14 +9,14 @@ socket.onclose = (event) => {
 };
 
 socket.onerror = (err) => {
-	console.log(`Ошибка: ${err.message}`);
+	console.log(`Ошибка: ${err}`);
 };
 
 socket.onmessage = (message) => {
 	console.log(message);
 };
 
-function sendData(data: JSON): void {
+function sendData(data: string): void {
 	if (!socket.readyState) {
 		setTimeout(() => {
 			sendData(data);

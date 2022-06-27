@@ -1,19 +1,19 @@
 {
-  "name": "uno-1",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fr0ggier/uno.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/fr0ggier/uno/issues"
-  },
-  "homepage": "https://github.com/fr0ggier/uno#readme"
+	"name": "uno",
+	"version": "1.0.0",
+	"description": "",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/fr0ggier/uno.git"
+	},
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/fr0ggier/uno/issues"
+	},
+	"homepage": "https://github.com/fr0ggier/uno#readme"
 }

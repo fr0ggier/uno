@@ -1,5 +1,3 @@
-import { json } from 'stream/consumers';
-
 const socket = new WebSocket('ws://localhost:3000');
 
 socket.onopen = () => {
@@ -62,7 +60,7 @@ function makeCode(): string {
 	let symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
 	for (let i = 0; i < 4; i++) {
-		code += symbols[Math.floor(Math.random() * symbols.length - 1)];
+		code += symbols[Math.floor(Math.random() * symbols.length)];
 	}
 
 	codez = code;

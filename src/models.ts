@@ -41,6 +41,10 @@ export class Player {
 	getCards() {
 		this.socket.send(JSON.stringify(this.cards));
 	}
+
+	getLastCard(card: Card) {
+		this.socket.send(JSON.stringify(card));
+	}
 }
 
 export class Game {
@@ -49,6 +53,7 @@ export class Game {
 	host: Player;
 	started: boolean;
 	deck: Card[];
+	lastCard: Card;
 
 	constructor(code: string, firstPlayer: Player) {
 		this.code = code;
@@ -59,6 +64,10 @@ export class Game {
 		this.started = false;
 
 		this.deck = [];
+		this.lastCard = {
+			color: ['red', 'yellow', 'blue', 'green'][randomNumber(0, 3)] as Color,
+			type: 'choice'
+		};
 
 		// Добавление карт с цифрами
 		for (let i = 0; i < 10; i++) {
@@ -109,6 +118,11 @@ export class Game {
 				player.cards.push(this.generateCard());
 			}
 			player.getCards();
+			player.getLastCard(this.lastCard);
 		});
 	}
+
+	cycle(): void {}
+
+	end(): void {}
 }

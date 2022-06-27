@@ -1,9 +1,9 @@
-const express = require('express');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
+import { WebSocketServer, WebSocket } from 'ws';
+import { createServer } from 'http';
+import * as express from 'express';
 
-let sockets: Object = {};
+const app = express();
+const server = createServer(app);
 
 type Color = 'red' | 'yellow' | 'blue' | 'green';
 type CardType = 'number' | 'reverse' | 'skip' | 'taketwo' | 'choice';
@@ -30,7 +30,7 @@ interface NumberCard extends Card {
 }
 
 class Player {
-	socket: any;
+	socket: WebSocket;
 	cards: Card[];
 
 	constructor(socket: any) {
@@ -46,11 +46,11 @@ class Player {
 class Game {
 	code: string;
 	players: Player[];
-	host: any;
+	host: Player;
 	started: boolean;
 	deck: Card[];
 
-	constructor(code: string, firstPlayer: any) {
+	constructor(code: string, firstPlayer: Player) {
 		this.code = code;
 
 		this.players = [firstPlayer];
@@ -110,7 +110,6 @@ function randomNumber(min: number, max: number): number {
 	return Math.floor(min + Math.random() * (max - min));
 }
 
-const { WebSocketServer } = require('ws');
 const wss = new WebSocketServer({
 	server: server,
 });

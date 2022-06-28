@@ -147,24 +147,25 @@ export class Game {
 	}
 
 	putCard(player: Player, card: Card): boolean {
-		if(typeof card.value == 'number' && card.value == this.lastCard.value){
+		if (typeof card.value == 'number' && card.value == this.lastCard.value) {
 			this.lastCard = card;
 
 			let i = player.cards.indexOf(card);
-			player.cards.splice(i, 1)
+			player.cards.splice(i, 1);
 
 			return true;
-		}
-		else if(!card.color || !this.lastCard.color || this.lastCard.color == card.color){
+		} else if (
+			!card.color ||
+			!this.lastCard.color ||
+			this.lastCard.color == card.color
+		) {
 			this.lastCard = card;
 
 			let i = player.cards.indexOf(card);
-			player.cards.splice(i, 1)
+			player.cards.splice(i, 1);
 
 			return true;
-		}
-		else
-			return false;
+		} else return false;
 	}
 
 	cycle(): void {}

@@ -1,10 +1,13 @@
-import { Player, Card } from './../../src/models';
+// import { Player, Card } from './../../src/models';
 
 const socket = new WebSocket('ws://localhost:3000');
 
-let cards: Card[] = [];
+/* let cards: Card[] = [];
 let lastCard: Card;
-let players: Player[] = [];
+let players: Player[] = []; */
+let cards: any;
+let lastCard: any;
+let players: any;
 // let turn:
 
 socket.onopen = () => {

@@ -1,10 +1,27 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<meta charset="utf-8" />
+		<title>Uno</title>
 		<link rel="stylesheet" href="./style.css" />
 	</head>
 
 	<body>
+		<div>
+			<b>Введите имя:</b>
+			<input type="text" id="playerName" placeholder="Guest" size="40" />
+			<br /><br /><button id="submitName">Отправить</button>
+		</div>
+
+		<br />
+
+		<div>
+			<b>Введите код:</b>
+			<input type="text" id="gameCode" placeholder="****" size="40" />
+			<br /><br /><button id="createGame">Создать игру</button>
+			<button id="joinGame">Зайти в игру</button>
+		</div>
+
 		<script src="js/script.js"></script>
 	</body>
 </html>

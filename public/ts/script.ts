@@ -2,13 +2,111 @@
 
 const socket = new WebSocket('ws://localhost:3000');
 
-/* let cards: Card[] = [];
-let lastCard: Card;
-let players: Player[] = []; */
-let cards: any;
-let lastCard: any;
-let players: any;
-// let turn:
+interface requestData {
+	type: string;
+	body: Object;
+}
+
+interface gamePrototype {
+	players?: string[];
+	lastCard?: Object;
+	code?: string;
+}
+
+function sendData(data: requestData): void {
+	if (!socket.readyState) {
+		setTimeout(() => {
+			sendData(data);
+		}, 100);
+	} else {
+		socket.send(JSON.stringify(data));
+	}
+}
+
+let player: Player;
+
+document.querySelector('#submitName')?.addEventListener('click', (e) => {
+	const playerName = document.getElementById('playerName') as HTMLInputElement;
+
+	if (player) return alert('Вы уже указали имя!');
+	player = new Player(socket, playerName.value);
+});
+
+document.querySelector('#createGame')?.addEventListener('click', (e) => {
+	player.game.code = (document.getElementById('gameCode') as HTMLInputElement).value;
+
+	if (!player) return alert('Вы не указали имя!');
+	if (!player.game.code) return alert('Вы не указали код!');
+
+	player.createGame(player.game.code, player.name);
+});
+
+document.querySelector('#joinGame')?.addEventListener('click', (e) => {
+	player.game.code = (document.getElementById('gameCode') as HTMLInputElement).value;
+
+	if (!player) return alert('Вы не указали имя!');
+	if (!player.game.code) return alert('Вы не указали код!');
+
+	player.joinGame(player.game.code, player.name);
+});
+
+class Player {
+	socket: WebSocket;
+	name: string;
+	cards: object[];
+	game: gamePrototype;
+
+	constructor(socket: WebSocket, name: string) {
+		this.socket = socket;
+
+		this.name = name;
+		this.cards = [];
+		
+		this.game = {
+			code: undefined,
+			players: [],
+			lastCard: {},
+		};
+	}
+
+	createGame(code: string, name: string) {
+		let requestData = {
+			type: 'createGame',
+			body: {
+				name: name,
+				code: code,
+			},
+		};
+
+		sendData(requestData);
+	}
+
+	joinGame(code: string, name: string) {
+		let requestData = {
+			type: 'joinGame',
+			body: {
+				name: name,
+				code: code,
+			},
+		};
+
+		sendData(requestData);
+	}
+
+	startGame() {
+		if (!this.name || !this.game.code) return;
+
+		let requestData = {
+			type: 'createGame',
+			body: {
+				name: this.name,
+				code: this.game.code,
+			},
+		};
+
+		sendData(requestData);
+	}
+}
 
 socket.onopen = () => {
 	console.log('Connected to server successfully');
@@ -25,63 +123,33 @@ socket.onerror = (err) => {
 socket.onmessage = (message) => {
 	const res = JSON.parse(message.data);
 
-	if (res.type == 'getCards') {
-		cards = res.body;
-	} else if (res.type == 'getLastCard') {
-		lastCard = res.body;
-	} else if (res.type == 'getPlayers') {
-		players = res.body;
+	/* 
+		Связанные с картами запросы: 
+		Описание ~ Тип ответа
+	*/
+
+	if (res.type == 'getCards') // Игрок получает свои карты ~ [Массив]
+	{
+		player.cards = res.body;
+	} 
+	
+	else if (res.type == 'getLastCard') // Игрок получается последнюю карту на столе ~ {Обьект}
+	{
+		player.game.lastCard = res.body;
+	}
+	
+	else if (res.type == 'getPlayers') // Игрок получается остальных игроков ~ {Массив}
+	{
+		player.game.players = res.body;
+	}
+
+
+	/*
+		Обработчики
+	*/
+
+	else if (res.type == 'error') // Обработчик ошибок ~ 'Строка'
+	{
+		alert(res.body);
 	}
 };
-
-function sendData(data: string): void {
-	if (!socket.readyState) {
-		setTimeout(() => {
-			sendData(data);
-		}, 100);
-	} else {
-		socket.send(data);
-	}
-}
-
-function joinGame(code: string, name: string): void {
-	let data = {
-		type: 'joinGame',
-		body: { code: code, name: name },
-	};
-
-	sendData(JSON.stringify(data));
-}
-
-function createGame(name: string): void {
-	let data = {
-		type: 'createGame',
-		body: { code: makeCode(), name: name },
-	};
-
-	sendData(JSON.stringify(data));
-}
-
-function startGame(code: string): void {
-	let data = {
-		type: 'startGame',
-		body: { code: code },
-	};
-
-	sendData(JSON.stringify(data));
-}
-
-let codez;
-
-function makeCode(): string {
-	let code = '';
-	let symbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-
-	for (let i = 0; i < 4; i++) {
-		code += symbols[Math.floor(Math.random() * symbols.length)];
-	}
-
-	codez = code;
-
-	return code;
-}

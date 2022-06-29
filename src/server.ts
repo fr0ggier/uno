@@ -22,24 +22,64 @@ wss.on('connection', (socket: any) => {
 	socket.on('message', (data: string) => {
 		let message = JSON.parse(data);
 
-		if (message.type == 'createGame') {
-			games.set(message.body.code, new Game(message.body.code, new Player(socket, message.body.name)));
-		} else if (message.type == 'joinGame') {
+		if (message.type == 'createGame')
+		{
+			if (!games.get(message.body.code)) { // Проверка на то, создана ли игра с таким кодом
+				games.set(
+					message.body.code,
+					new Game(message.body.code, new Player(socket, message.body.name))
+				);
+				console.log(
+					`Челик ${message.body.name} создал игру с кодом ${message.body.code}!`
+				);
+			} else {
+				let data: Object = {
+					type: 'error',
+					body: 'Игра с таким кодом уже существует!'
+				};
+
+				socket.send(JSON.stringify(data));
+			}
+		}
+		
+		else if (message.type == 'joinGame')
+		{
 			let game = games.get(message.body.code);
-			if (!game) {
-				// скажать что автор даун
+			if (!game) { // Проверка существует ли игра с таким кодом
+				let data: Object = {
+					type: 'error',
+					body: 'Игры с таким кодом не существует!'
+				};
+
+				socket.send(JSON.stringify(data));
 			} else {
 				game.addPlayer(socket, message.body.name);
+				console.log(
+					`Челик ${message.body.name} вошёл в игру с кодом ${message.body.code}!`
+				);
 			}
-		} else if (message.type == 'startGame') {
+		}
+		
+		else if (message.type == 'startGame')
+		{
 			let game = games.get(message.body.code);
-			if (!game) {
-				// сказать что автор даун
+			if (!game) { // Проверка существует ли игра с таким кодом
+				let data: Object = {
+					type: 'error',
+					body: 'Игру, который вы пытаетесь запустить не существует!'
+				};
+
+				socket.send(JSON.stringify(data));
 			} else {
-				if (game.host.socket == socket) {
+				if (game.host.socket == socket) { // Проверка является ли человек хостом
 					game.start();
 				} else {
-					// сказать что автор женщина (не имеет прав)
+					let data: Object = {
+						type: 'error',
+						body: 'Вы не являетесь хостом этой игры!'
+					};
+
+					socket.send(JSON.stringify(data));
 				}
 			}
 		}

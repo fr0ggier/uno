@@ -3,7 +3,8 @@
 const socket = new WebSocket('ws://localhost:3000');
 
 interface requestData {
-	type: string;
+	type: 'event' | 'request' | 'response';
+	name: string;
 	body: Object;
 }
 
@@ -33,7 +34,9 @@ document.querySelector('#submitName')?.addEventListener('click', (e) => {
 });
 
 document.querySelector('#createGame')?.addEventListener('click', (e) => {
-	player.game.code = (document.getElementById('gameCode') as HTMLInputElement).value;
+	player.game.code = (
+		document.getElementById('gameCode') as HTMLInputElement
+	).value;
 
 	if (!player) return alert('Вы не указали имя!');
 	if (!player.game.code) return alert('Вы не указали код!');
@@ -42,7 +45,9 @@ document.querySelector('#createGame')?.addEventListener('click', (e) => {
 });
 
 document.querySelector('#joinGame')?.addEventListener('click', (e) => {
-	player.game.code = (document.getElementById('gameCode') as HTMLInputElement).value;
+	player.game.code = (
+		document.getElementById('gameCode') as HTMLInputElement
+	).value;
 
 	if (!player) return alert('Вы не указали имя!');
 	if (!player.game.code) return alert('Вы не указали код!');
@@ -61,7 +66,7 @@ class Player {
 
 		this.name = name;
 		this.cards = [];
-		
+
 		this.game = {
 			code: undefined,
 			players: [],
@@ -120,36 +125,27 @@ socket.onerror = (err) => {
 	console.log(`Ошибка: ${err}`);
 };
 
+interface messageHandler {
+	[key: string]: any
+}
+
+const handleMessage: messageHandler = {
+	event: {}
+	request: {},
+	response: {},
+};
+
 socket.onmessage = (message) => {
-	const res = JSON.parse(message.data);
+	const res: requestData = JSON.parse(message.data);
 
-	/* 
-		Связанные с картами запросы: 
-		Описание ~ Тип ответа
-	*/
-
-	if (res.type == 'getCards') // Игрок получает свои карты ~ [Массив]
-	{
-		player.cards = res.body;
-	} 
-	
-	else if (res.type == 'getLastCard') // Игрок получается последнюю карту на столе ~ {Обьект}
-	{
-		player.game.lastCard = res.body;
-	}
-	
-	else if (res.type == 'getPlayers') // Игрок получается остальных игроков ~ {Массив}
-	{
-		player.game.players = res.body;
-	}
-
-
-	/*
-		Обработчики
-	*/
-
-	else if (res.type == 'error') // Обработчик ошибок ~ 'Строка'
-	{
-		alert(res.body);
+	if ((res.type = 'event')) {
+		handleMessage.event.hasOwnProperty(res.name) ? handleMessage.event[res.name];
+	} else if ((res.type = 'request')) {
+	} else if ((res.type = 'response')) {
 	}
 };
+
+function getCards() {}
+function getLastCard() {}
+function getPlayers() {}
+function unknownHandler() {}
